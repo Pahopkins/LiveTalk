@@ -3,17 +3,23 @@ import fetch from "node-fetch";
 import cors from "cors";
 import fs from "fs";
 import pdf from "pdf-parse";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+// Ensure we always resolve to repo root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load PDF on startup
 let propertyDetails = "Property details not loaded yet.";
 
 async function loadMLS() {
   try {
-    const dataBuffer = fs.readFileSync("./Listing.pdf"); // Must be in repo root
+    const dataBuffer = fs.readFileSync(path.join(__dirname, "Listing.pdf")); // Uses absolute path
     const pdfData = await pdf(dataBuffer);
     propertyDetails = pdfData.text;
     console.log("✅ MLS PDF loaded successfully");
