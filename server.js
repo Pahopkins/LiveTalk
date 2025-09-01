@@ -4,40 +4,38 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
 const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Resolve directory paths safely
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load PDF on startup
 let propertyDetails = "Property details not loaded yet.";
 
 async function loadMLS() {
   try {
     const filePath = path.join(__dirname, "Listing.pdf");
-    const file = fs.readFileSync(filePath);
+    const rawData = new Uint8Array(fs.readFileSync(filePath));
+    const pdfDoc = await pdfjsLib.getDocument({ data: rawData }).promise;
 
-    const pdfDoc = await PDFDocument.load(file);
-    let text = "";
+    let textContent = "";
+    for (let i = 0; i < pdfDoc.numPages; i++) {
+      const page = await pdfDoc.getPage(i + 1);
+      const content = await page.getTextContent();
+      const strings = content.items.map((item) => item.str);
+      textContent += strings.join(" ") + "\n";
+    }
 
-    // NOTE: pdf-lib doesn’t have a built-in text extractor.
-    // For MVP, we can dump metadata (page count) and mark property loaded.
-    const pageCount = pdfDoc.getPageCount();
-    text = `MLS Sheet loaded successfully. Pages: ${pageCount}.`;
-
-    propertyDetails = text;
-    console.log("✅ MLS PDF loaded successfully");
+    propertyDetails = textContent;
+    console.log("✅ MLS PDF loaded with text extraction");
   } catch (err) {
     console.error("❌ Error loading MLS PDF:", err);
   }
 }
 
-// Load PDF at startup
 await loadMLS();
 
 app.post("/chat", async (req, res) => {
@@ -55,7 +53,7 @@ app.post("/chat", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `You are a property assistant. Use ONLY the following MLS property data when answering:\n\n${propertyDetails}`
+            content: `You are a property assistant. Use ONLY this MLS data when answering questions:\n\n${propertyDetails}`
           },
           ...messages
         ]
