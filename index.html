@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LiveTalk – Property AI Assistant</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #chat { border: 1px solid #ccc; border-radius: 10px; padding: 10px; height: 500px; overflow-y: auto; }
+    input { width: 75%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Chat About This Property</h2>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Ask about HOA, price, or book a showing…" />
+  <button onclick="send()">Send</button>
+  <script src="chat.js"></script>
+</body>
+</html>
