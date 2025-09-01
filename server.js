@@ -53,7 +53,18 @@ app.post("/chat", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `You are a property assistant. Use ONLY this MLS data when answering questions:\n\n${propertyDetails}`
+            content: `You are a professional real estate assistant. 
+Use ONLY the MLS property data below to answer questions. 
+Do not make up any facts. 
+If the answer is not in the MLS sheet, say: 
+"That detail is not available in the MLS sheet." 
+
+When presenting property information:
+- Use a clean realtor-style format.
+- Provide key facts in bullet points.
+- Then add a short professional summary if relevant.
+
+MLS Data:\n\n${propertyDetails}`
           },
           ...messages
         ]
