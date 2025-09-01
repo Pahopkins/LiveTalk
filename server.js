@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "*" })); // Allow all origins
 app.use(express.json());
 
 app.post("/chat", async (req, res) => {
@@ -19,7 +19,7 @@ app.post("/chat", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-realtime",
         messages: [
-          { role: "system", content: `You are a property assistant. Use ONLY these details: ${propertyDetails}. Answer questions and book showings.` },
+          { role: "system", content: `You are a property assistant. Use ONLY these details: ${propertyDetails}.` },
           ...messages
         ],
         voice: "marin"
@@ -28,9 +28,10 @@ app.post("/chat", async (req, res) => {
 
     const data = await response.json();
     res.json(data);
+
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Server error:", error);
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
 
