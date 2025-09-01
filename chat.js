@@ -6,7 +6,7 @@ async function send() {
 
   chatDiv.innerHTML += `<p><b>You:</b> ${userMsg}</p>`;
 
-  const response = await fetch("https://your-backend-url/chat", {
+const response = await fetch("https://livetalk-backend-lsfc.onrender.com/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
